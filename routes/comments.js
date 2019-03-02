@@ -47,10 +47,17 @@ router.post("/",middleware.isLoggedIn,function(req, res){
 });
 
 router.get("/:commentId/edit", middleware.isLoggedIn, function(req, res){
+    Campground.findById(req.params.id, function(err, foundCampground) {
+        if(err || !foundCampground){
+            req.flash("error", "Campground not found");
+            res.redirect("back"); 
+        }
+    })
     // find campground by id
     Comment.findById(req.params.commentId, function(err, comment){
         if(err){
-            console.log(err);
+            req.flash("error", "Comment not found");
+            res.redirect("back");
         } else {
              res.render("comments/edit", {campground_id: req.params.id, comment: comment});
         }
