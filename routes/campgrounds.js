@@ -3,6 +3,7 @@ var router  = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
 var request = require("request");
+var Comment = require("../models/comment");
 
 //INDEX - show all campgrounds
 router.get("/", function(req, res){
@@ -78,27 +79,33 @@ router.get("/:id/edit", middleware.checkUserCampground, function(req, res){
 });
 
 router.put("/:id", function(req, res){
-    var newData = {name: req.body.name, image: req.body.image, description: req.body.desc};
-    Campground.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, campground){
+    Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
         if(err){
             req.flash("error", err.message);
             res.redirect("back");
         } else {
             req.flash("success","Successfully Updated!");
-            res.redirect("/campgrounds/" + campground._id);
+            res.redirect("/campgrounds/" + updatedCampground._id);
         }
     });
 });
 
-
-//middleware
-// function isLoggedIn(req, res, next){
-//     if(req.isAuthenticated()){
-//         return next();
-//     }
-//     req.flash("error", "You must be signed in to do that!");
-//     res.redirect("/login");
-// }
+// DESTROY CAMPGROUND ROUTE
+router.delete("/:id", function(req, res){
+    Campground.findByIdAndRemove(req.params.id, function(err, campgroundRemoved){
+        if(err){
+            res.redirect("campgrounds");
+        } else {
+            Comment.deleteMany( {_id: { $in: campgroundRemoved.comments } }, (err) => {
+            if (err) {
+                console.log(err);
+            }
+            res.redirect("/campgrounds");
+            });
+        }
+        
+    });
+});
 
 module.exports = router;
 
