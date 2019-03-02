@@ -65,8 +65,8 @@ router.get("/:id", function(req, res){
     });
 });
 
+// EDIT CAMPGROUND
 router.get("/:id/edit", middleware.checkUserCampground, function(req, res){
-    console.log("IN EDIT!");
     //find the campground with provided ID
     Campground.findById(req.params.id, function(err, foundCampground){
         if(err){
@@ -78,7 +78,8 @@ router.get("/:id/edit", middleware.checkUserCampground, function(req, res){
     });
 });
 
-router.put("/:id", function(req, res){
+// UPDATE CAMPGROUND
+router.put("/:id", middleware.checkUserCampground, function(req, res){
     Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
         if(err){
             req.flash("error", err.message);
@@ -91,7 +92,7 @@ router.put("/:id", function(req, res){
 });
 
 // DESTROY CAMPGROUND ROUTE
-router.delete("/:id", function(req, res){
+router.delete("/:id", middleware.checkUserCampground, function(req, res){
     Campground.findByIdAndRemove(req.params.id, function(err, campgroundRemoved){
         if(err){
             res.redirect("campgrounds");

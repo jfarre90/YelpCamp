@@ -1,6 +1,8 @@
 var Comment = require("../models/comment");
 var Campground = require("../models/campground");
 module.exports = {
+    
+    
     isLoggedIn: function(req, res, next){
         if(req.isAuthenticated()){
             return next();
@@ -11,7 +13,9 @@ module.exports = {
     checkUserCampground: function(req, res, next){
         if(req.isAuthenticated()){
             Campground.findById(req.params.id, function(err, campground){
-               if(campground.author.id.equals(req.user._id)){
+                if (err){
+                    console.log(err);
+                }else if(campground.author.id.equals(req.user._id)){
                    next();
                } else {
                    req.flash("error", "You don't have permission to do that!");
@@ -28,7 +32,9 @@ module.exports = {
         console.log("YOU MADE IT!");
         if(req.isAuthenticated()){
             Comment.findById(req.params.commentId, function(err, comment){
-               if(comment.author.id.equals(req.user._id)){
+                if(err) {
+                    console.log(err);
+                } else if(comment.author.id.equals(req.user._id)){
                    next();
                } else {
                    req.flash("error", "You don't have permission to do that!");
