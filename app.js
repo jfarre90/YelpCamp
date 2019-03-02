@@ -9,8 +9,9 @@ var express     = require("express"),
     Campground  = require("./models/campground"),
     Comment     = require("./models/comment"),
     User        = require("./models/user"),
-    session = require("express-session"),
-    methodOverride = require("method-override");
+    session      = require("express-session"),
+    methodOverride  = require("method-override");
+   
     
 //requiring routes
 var commentRoutes    = require("./routes/comments"),
