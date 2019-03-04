@@ -26,6 +26,7 @@ app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride('_method'));
 app.use(cookieParser('secret'));
+app.locals.moment = require('moment'); //Now we can use momentJS in all the view files.
 
 // PASSPORT CONFIGURATION
 app.use(require("express-session")({
