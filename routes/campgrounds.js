@@ -2,6 +2,18 @@ var express = require("express");
 var router  = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
+var NodeGeocoder = require('node-geocoder');
+
+//adding GMAPS
+var options = {
+  provider: 'google',
+  httpAdapter: 'https',
+  apiKey: process.env.GEOCODER_API_KEY,
+  formatter: null
+};
+ 
+var geocoder = NodeGeocoder(options);
+
 var request = require("request");
 var Comment = require("../models/comment");
 var multer = require('multer');
@@ -34,13 +46,8 @@ router.get("/", function(req, res){
        if(err){
            console.log(err);
        } else {
-           request('https://maps.googleapis.com/maps/api/geocode/json?address=sardine%20lake%20ca&key=AIzaSyBtHyZ049G_pjzIXDKsJJB5zMohfN67llM', function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                console.log(body); // Show the HTML for the Modulus homepage.
-                res.render("campgrounds/index",{campgrounds:allCampgrounds});
+            res.render("campgrounds/index",{campgrounds:allCampgrounds});
 
-            }
-});
        }
     });
 });
@@ -48,22 +55,34 @@ router.get("/", function(req, res){
 //CREATE - add new campground to DB
 router.post("/", middleware.isLoggedIn, upload.single('image'), function(req, res) {
     cloudinary.uploader.upload(req.file.path, function(result) {
-    // add cloudinary url for the image to the campground object under image property
-    req.body.campground.image = result.secure_url;
-    // add author to campground
-    req.body.campground.author = {
-        id: req.user._id,
-        username: req.user.username
-    }
-    Campground.create(req.body.campground, function(err, campground) {
-        if (err) {
-          req.flash('error', err.message);
-          return res.redirect('back');
+        // add cloudinary url for the image to the campground object under image property
+        req.body.campground.image = result.secure_url;
+        // add author to campground
+        req.body.campground.author = {
+            id: req.user._id,
+            username: req.user.username
         }
-        res.redirect('/campgrounds/' + campground.id);
-      });
-    });
+    //add map location
+        geocoder.geocode(req.body.location, function (err, data) {
+            if (err || !data.length) {
+                console.log(err);
+              req.flash('error', 'Invalid address');
+              return res.redirect('back');
+            }
+            req.body.campground.lat = data[0].latitude;
+            req.body.campground.lng = data[0].longitude;
+            req.body.campground.location = data[0].formattedaddress;
+            
         
+            Campground.create(req.body.campground, function(err, campground) {
+                if (err) {
+                    req.flash('error', err.message);
+                    return res.redirect('back');
+                }
+                res.redirect('/campgrounds/' + campground.id);
+            });
+        });
+    }); 
 });
 
 //NEW - show form to create new campground
@@ -101,14 +120,24 @@ router.get("/:id/edit", middleware.checkUserCampground, function(req, res){
 
 // UPDATE CAMPGROUND
 router.put("/:id", middleware.checkUserCampground, function(req, res){
-    Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
-        if(err){
-            req.flash("error", err.message);
-            res.redirect("back");
-        } else {
-            req.flash("success","Successfully Updated!");
-            res.redirect("/campgrounds/" + updatedCampground._id);
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+          req.flash('error', 'Invalid address');
+          return res.redirect('back');
         }
+        req.body.campground.lat = data[0].latitude;
+        req.body.campground.lng = data[0].longitude;
+        req.body.campground.location = data[0].formattedAddress;
+        
+        Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
+            if(err){
+                req.flash("error", err.message);
+                res.redirect("back");
+            } else {
+                req.flash("success","Successfully Updated!");
+                res.redirect("/campgrounds/" + updatedCampground._id);
+            }
+        });
     });
 });
 
