@@ -2,6 +2,18 @@ var express = require("express");
 var router  = express.Router();
 var Campground = require("../models/campground");
 var middleware = require("../middleware");
+var NodeGeocoder = require('node-geocoder');
+
+//adding GMAPS
+var options = {
+  provider: 'google',
+  httpAdapter: 'https',
+  apiKey: 'AIzaSyDiXJjVNhTUK-ZeILtQ6yAFPs73Nfv6Lkg', //need to remove this before uploading!
+  formatter: null
+};
+ 
+var geocoder = NodeGeocoder(options);
+
 var request = require("request");
 var Comment = require("../models/comment");
 var multer = require('multer');
@@ -48,22 +60,33 @@ router.get("/", function(req, res){
 //CREATE - add new campground to DB
 router.post("/", middleware.isLoggedIn, upload.single('image'), function(req, res) {
     cloudinary.uploader.upload(req.file.path, function(result) {
-    // add cloudinary url for the image to the campground object under image property
-    req.body.campground.image = result.secure_url;
-    // add author to campground
-    req.body.campground.author = {
-        id: req.user._id,
-        username: req.user.username
-    }
-    Campground.create(req.body.campground, function(err, campground) {
-        if (err) {
-          req.flash('error', err.message);
-          return res.redirect('back');
+        // add cloudinary url for the image to the campground object under image property
+        req.body.campground.image = result.secure_url;
+        // add author to campground
+        req.body.campground.author = {
+            id: req.user._id,
+            username: req.user.username
         }
-        res.redirect('/campgrounds/' + campground.id);
-      });
-    });
+    //add map location
+        geocoder.geocode(req.body.location, function (err, data) {
+            if (err || !data.length) {
+              req.flash('error', 'Invalid address');
+              return res.redirect('back');
+            }
+            req.body.campground.lat = data[0].latitude;
+            req.body.campground.lng = data[0].longitude;
+            req.body.campground.location = data[0].formattedaddress;
+            
         
+            Campground.create(req.body.campground, function(err, campground) {
+                if (err) {
+                    req.flash('error', err.message);
+                    return res.redirect('back');
+                }
+                res.redirect('/campgrounds/' + campground.id);
+            });
+        });
+    }); 
 });
 
 //NEW - show form to create new campground
