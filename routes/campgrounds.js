@@ -124,14 +124,24 @@ router.get("/:id/edit", middleware.checkUserCampground, function(req, res){
 
 // UPDATE CAMPGROUND
 router.put("/:id", middleware.checkUserCampground, function(req, res){
-    Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
-        if(err){
-            req.flash("error", err.message);
-            res.redirect("back");
-        } else {
-            req.flash("success","Successfully Updated!");
-            res.redirect("/campgrounds/" + updatedCampground._id);
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+          req.flash('error', 'Invalid address');
+          return res.redirect('back');
         }
+        req.body.campground.lat = data[0].latitude;
+        req.body.campground.lng = data[0].longitude;
+        req.body.campground.location = data[0].formattedAddress;
+        
+        Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
+            if(err){
+                req.flash("error", err.message);
+                res.redirect("back");
+            } else {
+                req.flash("success","Successfully Updated!");
+                res.redirect("/campgrounds/" + updatedCampground._id);
+            }
+        });
     });
 });
 
