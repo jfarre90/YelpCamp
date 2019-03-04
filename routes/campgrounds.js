@@ -8,7 +8,7 @@ var NodeGeocoder = require('node-geocoder');
 var options = {
   provider: 'google',
   httpAdapter: 'https',
-  apiKey: 'AIzaSyDiXJjVNhTUK-ZeILtQ6yAFPs73Nfv6Lkg', //need to remove this before uploading!
+  apiKey: process.env.GEOCODER_API_KEY,
   formatter: null
 };
  
@@ -46,13 +46,8 @@ router.get("/", function(req, res){
        if(err){
            console.log(err);
        } else {
-           request('https://maps.googleapis.com/maps/api/geocode/json?address=sardine%20lake%20ca&key=AIzaSyBtHyZ049G_pjzIXDKsJJB5zMohfN67llM', function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                console.log(body); // Show the HTML for the Modulus homepage.
-                res.render("campgrounds/index",{campgrounds:allCampgrounds});
+            res.render("campgrounds/index",{campgrounds:allCampgrounds});
 
-            }
-});
        }
     });
 });
@@ -70,6 +65,7 @@ router.post("/", middleware.isLoggedIn, upload.single('image'), function(req, re
     //add map location
         geocoder.geocode(req.body.location, function (err, data) {
             if (err || !data.length) {
+                console.log(err);
               req.flash('error', 'Invalid address');
               return res.redirect('back');
             }
