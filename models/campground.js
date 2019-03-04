@@ -4,6 +4,7 @@ var campgroundSchema = new mongoose.Schema({
    name: String,
    image: String,
    description: String,
+   createdAt: {type:Date, default:Date.now},
    location: String,
    lat: Number,
    lng: Number,
@@ -24,3 +25,4 @@ var campgroundSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("Campground", campgroundSchema);
+
