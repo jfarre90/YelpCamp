@@ -4,15 +4,46 @@
         <h1 style="text-align: center">Sign Up</h1>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/register" method="post">
+                <!--Username-->
                 <div class="form-group">
-                    <input class="form-control" type="text" name="username" placeholder="username">
+                    <label for="username">Username</label>
+                    <input class="form-control" type="text" name="username" placeholder="username" required>
+                </div>
+                
+                <!--Email-->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input class="form-control" type="text" name="email" placeholder="tom@gmail.com" required>
+                </div> 
+                
+                <!--Password-->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input class="form-control" type="password" name="password" placeholder="password" required>
+                </div>
+                
+                <!--Name-->
+                <div class="form-group">
+                    <label for="firstName">Username</label>
+                    <input class="form-control" type="text" name="firstName" placeholder="First Name" required>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="password" name="password" placeholder="password">
+                    <label for="lastName">Username</label>
+                    <input class="form-control" type="text" name="lastName" placeholder="Last Name" required>
                 </div>
+                
+                <!--Avatar-->
                 <div class="form-group">
+                    <label for="avatar">Avatar</label>
+                    <input class="form-control" type="text" name="avatar" placeholder="Avatar image URL">
+                </div> 
+                
+                <!--Submit button-->
+                <div class="form-group">
+                    <label for="campground[description]">Campground Description</label>
                     <button class="btn btn-lg btn-primary btn-block">Sign Up!</button>
                 </div>
+        
             </form>
             <a href="/campgrounds">Go Back</a>
         </div>
