@@ -18,6 +18,7 @@
     "ejs": "^2.3.4",
     "express": "^4.13.3",
     "express-session": "^1.11.3",
+    "locus": "^2.0.1",
     "method-override": "^3.0.0",
     "moment": "^2.24.0",
     "mongoose": "^5.4.16",
