@@ -24,13 +24,13 @@
     </div> 
 </div>
 <% if (!currentUser) {%>
-     <h1>Is this you?Sign in!</h1>
+     <h4>Is this you?Sign in!</h4>
 <% } else if(currentUser.id === user.id && !user.isAdmin){ %>
     <a href="/users/<%=user.id%>/adminRequest">Become an Admin</a>
 <% } else if (currentUser.id === user.id && user.isAdmin) { %>
-        <h1>You are an admin!</h1> 
+        <h4>You are an admin!</h4> 
 <% } else { %>
-        <h1>Why don't you become friends?</h1>
+        <h4>Why don't you become friends?</h4>
 <% } %>
 
 <% include ../partials/footer %>
