@@ -61,27 +61,28 @@ router.get("/logout", function(req, res){
 
 // forgot password route
 router.get("/forgotPassword", function(req,res){
-    res.redner("forgotPassword")
+    res.render("forgotPassword")
 })
 
 router.post("/forgotPassword", function(req,res, next){
     async.waterfall([
         function(done){
             crypto.randomBytes(20, function(err, buff) {
-                var token = buf.toString("hex");
+                var token = buff.toString("hex");
                 done(err, token);
             });
         },
         function(token, done) {
             User.findOne({email: req.body.email}, function(err, user) {
+                if (err) console.log(err);
                 if (!user) {
                     req.flash("error", "That email does not match any account.");
-                    return res.redirect("/forgot");
+                    return res.redirect("/forgotPassword");
                 }
                 
                 user.resetPasswordToken = token;
-                user.resetPasswordExpires = Date.now() + 3600000; //1 hour before the password expires
-                
+                user.resetPasswordExpires = Date.now()+3600000; //1 hour before the password expires
+
                 user.save(function(err) {
                     done(err,token,user);
                 });
@@ -99,46 +100,49 @@ router.post("/forgotPassword", function(req,res, next){
                 to: user.email,
                 from: "javier-donotreply@yelpcamp.com",
                 subject:"Yelpcamp password reset",
-                text: "you are receiving this because you (or someone else) have requested the reset of the password"+
-                "please click on the following link, or paste this into your browser to complete the process"+
+                text: "you are receiving this because you (or someone else) have requested the reset of their password \n\n"+
+                "Please click on the following link, or paste this into your browser to complete the process: \n"+
                 "http://" + req.headers.host + "/reset/" + token + "\n\n" +
-                "if you didn't request a password change, please ignore this email and your password will remain unchanged."
+                "If you didn't request a password change, please ignore this email and your password will remain unchanged."
             };
             smtpTransport.sendMail(mailOptions, function(err) {
+                if (err) console.log(err);
                 console.log("mail sent");
                 req.flash("success", "An e-mail has been sent to " + user.email + " with further instructions to reset the password.");
                 done(err, "done");
             });
         }
     ], function (err) {
+        if (err) console.log(err);
         if (err) return next(err);
         res.redirect("/forgotPassword");
     });
 });
 
 router.get("/reset/:token", function (req, res) {
-    User.findOne({resetPasspordToken: req.params.token, resetPasswordExpires: { $gt:Date.now() }}, function(err, user) {
+    User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: { $gt:Date.now() }}, function(err, user) {
         if(err){
             console.log(err);
         } else if(!user) {
             req.flash("error", "Your password reset link is invalid or has expired.");
-            return res.redurect("/forgotPassword");
+            return res.redirect("/forgotPassword");
         }
-        res.render("reset", {roken: req.params.token});
+        res.render("resetPassword", {token: req.params.token});
     });
 });
 
 router.post("/reset/:token", function(req, res) {
   async.waterfall([
     function(done) {
-      User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+      User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now()} }, function(err, user) {
+        if (err) console.log(err);
         if (!user) {
           req.flash("error", "Password reset token is invalid or has expired.");
           return res.redirect("back");
         }
-        if(req.body.password === req.body.confirm) {
+        if(req.body.password.new === req.body.password.confirm) {
             //passport local mongoose method
-            user.setPassword(req.body.password, function(err) {
+            user.setPassword(req.body.password.new, function(err) {
             user.resetPasswordToken = undefined;
             user.resetPasswordExpires = undefined;
 

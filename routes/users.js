@@ -30,7 +30,7 @@ router.get ("/:id/adminRequest", middleware.isLoggedIn, function(req, res) {
     User.findById(req.params.id, function (err, user){
         if (err){
             console.log(err);
-            req.flash
+            req.flash("error", "something went wrong");
         } 
         res.render("users/adminRequest", {user: user});   
     })
@@ -39,9 +39,9 @@ router.get ("/:id/adminRequest", middleware.isLoggedIn, function(req, res) {
 
 router.post ("/:id", function (req,res){
     if(req.body.adminCode ==="secret"){
-        User.findOneAndUpdate(req.params.id, {isAdmin: true} , function(err, user){
+        User.findByIdAndUpdate(req.params.id, {isAdmin: true} , function(err, user){
             if(err){
-                req.flash("error", "Comment not found");
+                req.flash("error", "you don't exist in the database");
                 return res.redirect("back");
             } 
             req.flash("success", "You are now an admin "+ user.username);
