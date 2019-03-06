@@ -2,7 +2,8 @@ var express = require("express");
 var router  = express.Router();
 var User = require("../models/user");
 var Campground = require("../models/campground");
-var passport = require("passport");
+var middleware = require("../middleware");
+
 
 
 
@@ -11,13 +12,13 @@ router.get("/:id", function(req,res){
         if(err) {
             req.flash("error","Something went wrong.");
             console.log(err);
-            res.redirect("/");
+            return res.redirect("/");
         }
         Campground.find().where('author.id').equals(foundUser._id).exec(function(err, campgrounds) {
             if(err) {
                 req.flash("error","Something went wrong.");
                 console.log(err);
-                res.redirect("/");
+                return res.redirect("/");
             }   
             res.render("users/show", {user: foundUser, campgrounds: campgrounds});
         });
@@ -29,6 +30,7 @@ router.get ("/:id/adminRequest", function(req, res) {
     User.findById(req.params.id, function (err, user){
         if (err){
             console.log(err);
+            req.flash
         } 
         res.render("users/adminRequest", {user: user});   
     })
@@ -37,12 +39,13 @@ router.get ("/:id/adminRequest", function(req, res) {
 
 router.post ("/:id", function (req,res){
     if(req.body.adminCode ==="secret"){
-        User.findByIdAndUpdate(req.params.id, {isAdmin: true} , function(err, user){
+        User.findOneAndUpdate(req.params.id, {isAdmin: true} , function(err, user){
             if(err){
                 req.flash("error", "Comment not found");
                 res.redirect("back");
             } else {
-                res.redirect("campgrounds");
+                req.flash("success", "You are now an admin "+ user.username);
+                res.redirect("/campgrounds");
             }
         });
         
