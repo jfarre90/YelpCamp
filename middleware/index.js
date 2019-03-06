@@ -15,11 +15,11 @@ module.exports = {
                 if (err || !campground){
                     req.flash("error","Campground not found");
                     res.redirect("back");
-                }else if(campground.author.id.equals(req.user._id)){
+                }else if(campground.author.id.equals(req.user._id) || req.user.isAdmin){
                    next();
                } else {
                    req.flash("error", "You don't have permission to do that!");
-                   console.log("BADD!!!");
+                   console.log("naughty man!");
                    res.redirect("/campgrounds/" + req.params.id);
                }
             });
@@ -35,7 +35,7 @@ module.exports = {
                 if(err) {
                     req.flash("error", "Comment not found");
                     res.redirect("back");
-                } else if(comment.author.id.equals(req.user._id)){
+                } else if(comment.author.id.equals(req.user._id) || req.user.isAdmin){
                    next();
                } else {
                    req.flash("error", "You don't have permission to do that!");

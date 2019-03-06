@@ -26,7 +26,7 @@ router.get("/:id", function(req,res){
     
 });
 
-router.get ("/:id/adminRequest", function(req, res) {
+router.get ("/:id/adminRequest", middleware.isLoggedIn, function(req, res) {
     User.findById(req.params.id, function (err, user){
         if (err){
             console.log(err);
@@ -42,11 +42,11 @@ router.post ("/:id", function (req,res){
         User.findOneAndUpdate(req.params.id, {isAdmin: true} , function(err, user){
             if(err){
                 req.flash("error", "Comment not found");
-                res.redirect("back");
-            } else {
-                req.flash("success", "You are now an admin "+ user.username);
-                res.redirect("/campgrounds");
-            }
+                return res.redirect("back");
+            } 
+            req.flash("success", "You are now an admin "+ user.username);
+            res.redirect("/campgrounds");
+        
         });
         
     }  else {
