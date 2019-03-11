@@ -1,11 +1,11 @@
 <% include ../partials/header %>
 
 <div class="row">
-    <h1><%= user.firstName + " " + user.lastName %></h1>
+    <h1 style="text-align: center;"><%= user.firstName + " " + user.lastName %></h1>
     <div class="col-md-4">
         <div class="thumbnail">
             <img src="<%=user.avatar%>" alt="User profile picture">
-            <div class="caption"> <a href="mailto:<%=user.email%>"><%=user.email %></a></div>
+            <div class="caption"><strong>Email: </strong><a href="mailto:<%=user.email%>"><%=user.email %></a></div>
         </div>
     </div>
     <div class="col-md-8">

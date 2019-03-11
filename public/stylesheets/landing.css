@@ -7,7 +7,7 @@
     background-position: center; 
     transition: background 1.5s linear;
     -webkit-backface-visibility: hidden;
-    webkit-transition: background-image 1.5s linear;
+    webkit-transition: background-image 4s linear;
     -webkit-transform:translate3d(0,0,0);
 }
 
@@ -17,6 +17,7 @@
     bottom: 0;
     left: 0;
     right: 0;
+    color:black;
 }
 
 body,

@@ -7,6 +7,32 @@ var async = require("async");
 var nodemailer = require("nodemailer");
 var crypto = require("crypto");
 
+//lines for adding image upload feature for the user register
+var multer = require('multer');
+var storage = multer.diskStorage({
+  filename: function(req, file, callback) {
+    callback(null, Date.now() + file.originalname);//creating a custom name for the file
+  }
+});
+var imageFilter = function (req, file, cb) {
+    // accept image files only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        return cb(new Error('Only image files wtih formats JPG, JPEG, PNG and GIF are allowed!'), false);
+    }
+    cb(null, true);
+};
+var upload = multer({ storage: storage, fileFilter: imageFilter})
+
+//Requiring cloudinary
+var cloudinary = require('cloudinary');
+cloudinary.config({ 
+  cloud_name: 'jfarre90', 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// ending of lines for image upload setup
+
 //root route
 router.get("/", function(req, res){
     res.render("landing");
@@ -18,23 +44,26 @@ router.get("/register", function(req, res){
 });
 
 //handle sign up logic
-router.post("/register", function(req, res){
-    var newUser = new User({
-        username: req.body.username,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        avatar: req.body.avatar
-    });
-    User.register(newUser, req.body.password, function(err, user){
-        if(err){
-            console.log(err);
-            req.flash("error", err.message);
-            return res.render("register", {error: err.message});
-        }
-        passport.authenticate("local")(req, res, function(){
-           req.flash("success", "Successfully Signed Up! Nice to meet you " + req.body.username);
-           res.redirect("/campgrounds"); 
+router.post("/register", upload.single('avatar'), function(req, res){
+    //image upload lines
+    cloudinary.uploader.upload(req.file.path, function(result) {
+        var newUser = new User({
+            username: req.body.username,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            avatar: result.secure_url
+        });
+        User.register(newUser, req.body.password, function(err, user){
+            if(err){
+                console.log(err);
+                req.flash("error", err.message);
+                return res.render("register", {error: err.message});
+            }
+            passport.authenticate("local")(req, res, function(){
+               req.flash("success", "Successfully Signed Up! Nice to meet you " + req.body.username);
+               res.redirect("/campgrounds"); 
+            });
         });
     });
 });

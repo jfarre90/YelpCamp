@@ -3,7 +3,7 @@
     <div class="row">
         <h1 style="text-align: center">Sign Up</h1>
         <div style="width: 30%; margin: 25px auto;">
-            <form action="/register" method="post">
+            <form action="/register" enctype="multipart/form-data" method="post">
                 <!--Username-->
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -35,7 +35,7 @@
                 <!--Avatar-->
                 <div class="form-group">
                     <label for="avatar">Profile Picture</label>
-                    <input class="form-control" type="text" name="avatar" placeholder="Profile image URL">
+                    <input type="file" name="avatar" id="avatar" accept="image/*" required>
                 </div> 
                 
                 <!--Submit button-->
