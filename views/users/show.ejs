@@ -8,29 +8,32 @@
             <div class="caption"> <a href="mailto:<%=user.email%>"><%=user.email %></a></div>
         </div>
     </div>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tortor neque, hendrerit nec accumsan sed, mollis sed lectus. Etiam mattis ullamcorper leo vel dignissim.
-    Maecenas ac enim non enim vulputate placerat. Mauris imperdiet nisi eu diam bibendum, eget tincidunt arcu finibus. Nulla varius hendrerit est, et volutpat ligula posuere ac. 
-    Cras viverra dui sed enim efficitur, ac ultricies purus porttitor. Integer hendrerit faucibus libero, in viverra lectus posuere sed. Suspendisse in sapien nisl. 
-    Aenean sit amet leo mauris. Ut convallis sagittis hendrerit. Nullam lacinia fermentum ante. Phasellus dictum nisl a erat commodo scelerisque. Nam facilisis nunc eu turpis 
-    imperdiet tempor.
     <div class="col-md-8">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tortor neque, hendrerit nec accumsan sed, mollis sed lectus. Etiam mattis ullamcorper leo vel dignissim.
+        Maecenas ac enim non enim vulputate placerat. Mauris imperdiet nisi eu diam bibendum, eget tincidunt arcu finibus. Nulla varius hendrerit est, et volutpat ligula posuere ac. 
+        Cras viverra dui sed enim efficitur, ac ultricies purus porttitor. Integer hendrerit faucibus libero, in viverra lectus posuere sed. Suspendisse in sapien nisl. 
+        Aenean sit amet leo mauris. Ut convallis sagittis hendrerit. Nullam lacinia fermentum ante. Phasellus dictum nisl a erat commodo scelerisque. Nam facilisis nunc eu turpis 
+        imperdiet tempor.</p>  
         <h3><%=user.username%>'s campgrounds:</h3>
         <ul>
             <% campgrounds.forEach(function(campground) { %>      
                 <li><a href="/campgrounds/<%=campground.id%>"><%=campground.name%>"</a></li>
             <% }); %>        
-            
         </ul>
-    </div> 
+    </div>
 </div>
-<% if (!currentUser) {%>
-     <h4>Is this you?Sign in!</h4>
-<% } else if(currentUser.id === user.id && !user.isAdmin){ %>
-    <a href="/users/<%=user.id%>/adminRequest">Become an Admin</a>
-<% } else if (currentUser.id === user.id && user.isAdmin) { %>
+
+<div class="col-md-12">
+    <% if (!currentUser) {%>
+        <h4>Is this you?Sign in!</h4>
+    <% } else if(currentUser.id === user.id && !user.isAdmin){ %>
+        <a href="/users/<%=user.id%>/adminRequest">Become an Admin</a>
+    <% } else if (currentUser.id === user.id && user.isAdmin) { %>
         <h4>You are an admin!</h4> 
-<% } else { %>
-        <h4>Why don't you become friends?</h4>
-<% } %>
+    <% } else { %>
+        <h4>If you like his content, why not following this user?</h4>
+    <% } %>
+</div>
+
 
 <% include ../partials/footer %>
